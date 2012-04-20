@@ -1,0 +1,27 @@
+{
+  "private": true,
+  "name": "ld48base",
+  "version": "0.0.1",
+  "author": "Leo Lännenmäki <leo.lannenmaki@gmail.com>",
+  "description": "a simple game engine for use in Ludum Dare compos written in CoffeeScript",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/leolannenmaki/ld48base.git"
+  },
+  "homepage": "https://github.com/leolannenmaki/ld48base",
+  "keywords": [
+    "game",
+    "engine",
+    "ld48",
+    "ludum dare"
+  ],
+  "license": [],
+  "dependencies": {
+	  "coffee-script": ">= 1.3.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "main": "index.js"
+}
