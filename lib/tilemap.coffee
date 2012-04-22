@@ -4,28 +4,46 @@ Collider = require './collider'
 Sprite = require './sprite'
 
 class TileMap extends Component
-	constructor: (@entity, @data, @tileData, @tileWidth, @screens) ->
+	constructor: (@entity, @level, @tileData, @tileWidth, @screens) ->
 		super
-		@width = @data.length
-		@height = @data[0].length
+		@loadTileData(@level)
+
+	loadTileData: (@level) ->
+		@width = @level.length
+		@height = @level[0].length
 		@worldHeight = @width * @tileWidth
 		@worldWidth = @height * @tileWidth
+		@tileChildren = []
 		@tileMap = []
-		for y  in [0...@data.length]
-			for x in [0...@data[y].length]
-				tileId = @data[y][x]
+		for y  in [0...@level.length]
+			for x in [0...@level[y].length]
+				tileId = @level[y][x]
 				tile = @tileData[tileId]
 				if not @tileMap[x]
 					@tileMap[x] = []
-				if tile.image
+				if tile.image and not tile.noTile
 					entity = new Entity(@entity.name + 'x: ' + x + ' y: ' + y, @tileToWorldX(x), @tileToWorldY(y))
 					entity.drawDebug = @entity.drawDebug
 					if not entity.drawDebug
-						sprite = new Sprite(entity, @screens, tile.image, 1, 1, undefined)
+						rows = if tile.animated then tile.rows else 1
+						columns = if tile.animated then tile.columns else 1
+						frameTime = if tile.animated then tile.frameTime else 0
+						sprite = new Sprite(entity, @screens, tile.image, rows, columns, frameTime)
 					isStatic = true
 					collider = new Collider(entity, @screens, @tileWidth, @tileWidth, isStatic, !tile.collide)
+					entity.data.walkable = tile.walkable
+					entity.data.tileName = tile.name
 					@entity.addChildEntity(entity)
+					@tileChildren.push(entity)
 					@tileMap[x][y] = { name: tile.name, image: tile.image, entity: entity, sprite: sprite, collider: collider, collide: tile.collide }
+
+	destroy: ->
+		@destroyTileData()
+
+	destroyTileData: ->
+		for entity in @tileChildren
+			@entity.removeChildEntity(entity)
+		@tileChildren = []
 
 	getTileSafe: (x, y) ->
 		if x >= 0 && x < @width && y >= 0 && y < @height

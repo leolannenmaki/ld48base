@@ -6,11 +6,20 @@ class Sound extends Component
 		@audio = document.createElement('audio') #new Audio()
 		@audio.volume = @volume
 		@audio.loop = @loop
-		@audio.onended = =>
-			if not @loop and @destroyOnStop
-				document.removeChild(@audio)
+
+		@audio.addEventListener('ended', =>
+			@audio.currentTime = 0
 			if @onStop
+				debugger
 				@onStop()
+			if not @loop
+				@playing = false
+				if @destroyOnStop
+					try
+						document.removeChild(@audio)
+					catch error
+					@entity.removeComponent(@)
+		)
 		@playing = false
 		@loaded = false
 
@@ -35,6 +44,7 @@ class Sound extends Component
 		@playing = false
 
 	play: ->
+		console.log(@playing)
 		if @playing
 			@audio.currentTime = 0
 		else

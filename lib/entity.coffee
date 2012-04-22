@@ -9,7 +9,10 @@ class Entity extends EventEmitter
 		console.log('Entity::constructor', @name, x, y)
 		@components = []
 		@entities = []
+		@entitiesToRemove = []
 		@parentEntity = null
+		# store user data here
+		@data = {}
 
 		@loaded = false
 
@@ -35,10 +38,18 @@ class Entity extends EventEmitter
 				return @components[i]
 
 	addChildEntity: (entity) ->
-		@game?.entitiesById[entity.id]
+		@game?.entitiesById[entity.id] = entity
 		entity.game = @game
 		entity.setParentEntity(this)
 		@entities.push(entity)
+
+	removeChildEntity: (entity) ->
+		i = 0
+		for i in [0...@entities.length]
+			if @entities[i] is entity
+				if @entitiesToRemove.indexOf(entity) is -1
+					@entitiesToRemove.push(entity)
+				break
 
 	setParentEntity: (entity) ->
 		@parentEntity = entity
@@ -49,7 +60,19 @@ class Entity extends EventEmitter
 				component.update(dt)
 
 		for entity in @entities
-			entity.update(dt)
+			if @entitiesToRemove.indexOf(entity) is -1
+				entity.update(dt)
+
+		if @entitiesToRemove.length > 0
+			for entity in @entitiesToRemove
+				for index in [0...@entities.length]
+					if @entities[index] is entity
+						removed = @entities.splice(index, 1)
+						removed[0].game = null
+						removed[0].destroy()
+			@entitiesToRemove = []
+		#for entity in @entities
+			#entity.update(dt)
 
 		if @componentsToRemove.length > 0
 			for component in @componentsToRemove

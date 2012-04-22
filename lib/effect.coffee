@@ -11,7 +11,7 @@ class Effect extends Component
 			screen.translateToOrigin(@entity, 0, 0)
 			screen.rotate(@entity.getComponent(Transform).rotation.angle)
 
-			@doEffect(screen.getContext())
+			@doEffect(screen.getContext(), dt)
 			screen.restore()
 
 exports = module.exports = Effect

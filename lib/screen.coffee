@@ -27,10 +27,17 @@ class Screen extends Component
 			callback()
 
 	draw: (dt) ->
-		@context.clearRect(0, 0, @width, @height)
+		if @bgColor
+			@context.fillStyle = @bgColor
+			@context.fillRect(0, 0, @width, @height)
+		else
+			@context.clearRect(0, 0, @width, @height)
 
 	flip: ->
 		@context.scale(-1, 1)
+
+	flipY: ->
+		@context.scale(1, -1)
 
 	drawImage: (img, imgX, imgY, imgWidth, imgheight, x, y, width, height) ->
 		if x <= @width and y <= @height and (x + width) > 0 and (y + height) > 0
@@ -46,7 +53,7 @@ class Screen extends Component
 	restore: ->
 		@context.restore()
 
-	translateToOrigin: (entity) ->
+	translateToOrigin: (entity, xOffset = 0, yOffset = 0) ->
 		xTemp = entity.getComponent(Transform).position.x
 		yTemp = entity.getComponent(Transform).position.y
 
@@ -61,7 +68,7 @@ class Screen extends Component
 
 		x -= @entity.getComponent(Transform).position.x
 		y += @entity.getComponent(Transform).position.y
-		@context.translate(x, y)
+		@context.translate(x + xOffset, y + yOffset)
 
 	rotate: (angle) ->
 		@context.rotate(Math.PI / 2 + angle)
